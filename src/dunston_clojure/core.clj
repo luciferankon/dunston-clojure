@@ -10,7 +10,7 @@
 
 (def regs (atom {:A 0 :B 0 :C 0 :D 0}))
 
-(def program "10 START\n20 MOV A,2\n30 ADD A,4\n40 ADD B,3\n50 PRN A\n60 PRN B\n70 STOP")
+(def program "10 START\n20 MOV A,2\n30 ADD A,4\n40 DIV A,3\n50 PRN A\n60 STOP")
 
 (defn coerce-to-number [val]
   (if (number? val)
@@ -23,12 +23,21 @@
 (defn add [x y]
   (mov x (+ (@regs (keyword x)) (coerce-to-number y))))
 
+(defn sub [x y]
+  (mov x (- (@regs (keyword x)) (coerce-to-number y))))
+
+(defn mul [x y]
+  (mov x (* (@regs (keyword x)) (coerce-to-number y))))
+
+(defn div [x y]
+  (mov x (float (/ (@regs (keyword x)) (coerce-to-number y)))))
+
 (defn prn [x]
   (if-let [val (@regs (keyword x))]
     (println val)
     (println x)))
 
-(def instruction-map {:PRN prn, :ADD add, :MOV mov})
+(def instruction-map {:PRN prn, :ADD add, :MOV mov, :SUB sub, :MUL mul, :DIV div})
 
 (def parsed-program (map parse-line (clojure.string/split program #"\n")))
 
